@@ -12,8 +12,8 @@ if not TOKEN:
 
 # Define intents
 intents = discord.Intents.default()
-intents.messages = True  # Enable specific intents as needed
-intents.message_content = True  # Required for reading message content
+intents.messages = False  # Disable unnecessary permissions
+intents.guilds = True  # Enable guild-related events
 
 # Create the bot instance
 bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
