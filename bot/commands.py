@@ -1,13 +1,15 @@
-from .db import DB 
+from discord.ext import commands
+from .db import DB
 
 
 def setup_commands(bot):
     db = DB()
 
     @bot.command()
+    @commands.cooldown(1, 5, commands.BucketType.user)  # 1 command per 5 seconds
     async def add(ctx, *, task_desc):
         db.add_task(ctx.author.id, task_desc)
-        await ctx.send(f"Задача добавлена: {task_desc}")
+        await ctx.send(f"Task added: {task_desc}")
 
     @bot.command()
     async def list(ctx):
