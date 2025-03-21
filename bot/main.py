@@ -7,6 +7,9 @@ from bot.commands import setup_commands
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
+if not TOKEN:
+    raise ValueError("Ошибка: переменная окружения DISCORD_TOKEN отсутствует. Убедитесь, что .env cодержит DISCORD_TOKEN=<ваш_токен>.")
+
 # Define intents
 intents = discord.Intents.default()
 intents.messages = True  # Enable specific intents as needed
@@ -21,5 +24,5 @@ setup_commands(bot)
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
-
+                     
 bot.run(TOKEN)
