@@ -11,6 +11,7 @@ class DB:
                               user_id INTEGER,
                               description TEXT,
                               status BOOLEAN DEFAULT 0)''')
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_user_id ON tasks(user_id);")
             conn.commit()
 
     def add_task(self, user_id, description):
@@ -42,3 +43,4 @@ class DB:
             conn.execute("DELETE FROM tasks WHERE id = ? AND user_id = ?", (task_id, user_id))
             conn.commit()
             return True  # Successfully deleted
+
