@@ -20,7 +20,7 @@ class DB:
     def get_tasks(self, user_id):
         cursor = self.conn.execute("SELECT * FROM tasks WHERE user_id = ?", (user_id,))
         return cursor.fetchall()
-
+       
     def update_task_status(self, user_id, task_id, status):
         cursor = self.conn.execute("SELECT id FROM tasks WHERE id = ? AND user_id = ?", (task_id, user_id))
         task = cursor.fetchone()
