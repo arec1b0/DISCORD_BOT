@@ -18,9 +18,9 @@ class DB:
             conn.execute("INSERT INTO tasks (user_id, description) VALUES (?, ?)", (user_id, description))
             conn.commit()
 
-    def get_tasks(self, user_id):
+    def get_tasks(self, user_id, limit=10, offset=0):
         with sqlite3.connect('tasks.db') as conn:
-            cursor = conn.execute("SELECT * FROM tasks WHERE user_id = ?", (user_id,))
+            cursor = conn.execute("SELECT * FROM tasks WHERE user_id = ? LIMIT ? OFFSET ?", (user_id, limit, offset))
             return cursor.fetchall()
        
     def update_task_status(self, user_id, task_id, status):
@@ -41,4 +41,4 @@ class DB:
                 return False  # Task not found
             conn.execute("DELETE FROM tasks WHERE id = ? AND user_id = ?", (task_id, user_id))
             conn.commit()
-            return True  
+            return True  # Successfully deleted
