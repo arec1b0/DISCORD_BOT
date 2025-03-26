@@ -1,19 +1,19 @@
 from discord.ext import commands
 from .db import DB
 
-
-def setup_commands(bot):
+async def setup_commands(bot):
     db = DB()
+    await db.create_table()  # Убедимся, что таблицы существуют
 
     @bot.command()
-    @commands.cooldown(1, 5, commands.BucketType.user)  # 1 command per 5 seconds
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def add(ctx, *, task_desc):
-        db.add_task(ctx.author.id, task_desc)
+        await db.add_task(ctx.author.id, task_desc)  # Добавил await
         await ctx.send(f"Task added: {task_desc}")
 
     @bot.command()
     async def list(ctx):
-        tasks = db.get_tasks(ctx.author.id)
+        tasks = await db.get_tasks(ctx.author.id)  # Добавил await
         if not tasks:
             await ctx.send("У вас нет задач!")
             return
@@ -26,7 +26,7 @@ def setup_commands(bot):
             await ctx.send("Ошибка: ID задачи должен быть целым числом.")
             return
         task_id = int(task_id)
-        if db.update_task_status(ctx.author.id, task_id, True):
+        if await db.update_task_status(ctx.author.id, task_id, True):  # Добавил await
             await ctx.send(f"Задача {task_id} выполнена!")
         else:
             await ctx.send(f"Ошибка: Задача {task_id} не найдена.")
@@ -37,7 +37,7 @@ def setup_commands(bot):
             await ctx.send("Ошибка: ID задачи должен быть целым числом.")
             return
         task_id = int(task_id)
-        if db.delete_task(ctx.author.id, task_id):
+        if await db.delete_task(ctx.author.id, task_id):  # Добавил await
             await ctx.send(f"Задача {task_id} удалена!")
         else:
             await ctx.send(f"Ошибка: Задача {task_id} не найдена.")
