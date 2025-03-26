@@ -3,6 +3,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 import os
 from bot.commands import setup_commands
+from bot.db import DB   # import the DB class
 import asyncio
 
 load_dotenv()
@@ -20,15 +21,20 @@ intents.message_content = True  # Enable guild-related events
 # Create the bot instance
 bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
 
-async def main():
-    await setup_commands(bot)
-    await bot.start(TOKEN)
-
-asyncio.run(main())
-
-
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
-                     
-bot.run(TOKEN)
+
+async def main():
+    # Initialize the database tables
+    db = DB()
+    await db.init()
+
+    await setup_commands(bot)
+    await bot.start(TOKEN)
+
+if __name__ == '__main__':
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("Shutting down the bot gracefully.")

@@ -3,7 +3,7 @@ from .db import DB
 
 async def setup_commands(bot):
     db = DB()
-    await db.create_table()  # Убедимся, что таблицы существуют
+    await db.init()   # Убедимся, что таблицы существуют
 
     @bot.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
