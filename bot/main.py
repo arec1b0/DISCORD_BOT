@@ -3,34 +3,35 @@ from discord.ext import commands
 from dotenv import load_dotenv
 import os
 from bot.commands import setup_commands
-from bot.db import DB   # import the DB class
+from bot.db import DB
 import asyncio
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 if not TOKEN:
-    raise ValueError("Ошибка: переменная окружения DISCORD_TOKEN отсутствует. Убедитесь, что .env cодержит DISCORD_TOKEN=<ваш_токен>.")
+    raise ValueError("Error: The DISCORD_TOKEN environment variable is missing. Make sure that .env contains DISCORD_TOKEN=<your_token>.")
 
-# Define intents
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 intents.messages = False  # Disable unnecessary permissions
 intents.guilds = True
 intents.message_content = True  # Enable guild-related events
 
-# Create the bot instance
+# Create an instance of the bot
 bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
+
+# Create a database instance
+db = DB()
 
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
+    print(f'Commands: {list(bot.commands)}')  # Output the list of commands
+
 
 async def main():
-    # Initialize the database tables
-    db = DB()
-    await db.init()
-
-    await setup_commands(bot)
+    await db.init()  # Initialize the base before starting the bot
+    await setup_commands(bot, db)  # Pass the same database instance to the commands
     await bot.start(TOKEN)
 
 if __name__ == '__main__':
