@@ -25,7 +25,7 @@ async def setup_commands(bot, db: DB):  # Pass db as a dependency
             await ctx.send("Error: Task ID must be an integer.")
             return
         task_id = int(task_id)
-        if await db.update_task_status(ctx.author.id, task_id, True):
+        if await db.mark_task_done(ctx.author.id, task_id, True):
             await ctx.send(f"Task {task_id} completed!")
         else:
             await ctx.send(f"Error: Task {task_id} not found.")
