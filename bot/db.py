@@ -29,14 +29,24 @@ class DB:
             await conn.close()
 
     async def add_task(self, user_id, description):
-        # Adding a new task.
+        # Add a new task with a compact ID system.
         try:
             async with self.get_db() as db:
-                await db.execute("INSERT INTO tasks (user_id, description) VALUES (?, ?)",
-                                 (user_id, description))
+                # Get the smallest available ID
+                cursor = await db.execute(
+                    "SELECT MIN(t1.id + 1) FROM tasks t1 WHERE NOT EXISTS "
+                    "(SELECT 1 FROM tasks t2 WHERE t2.id = t1.id + 1)"
+                )
+                next_id = await cursor.fetchone()
+                task_id = next_id[0] if next_id[0] is not None else 1  # If the table is empty, start with 1
+
+                await db.execute(
+                    "INSERT INTO tasks (id, user_id, description) VALUES (?, ?, ?)",
+                    (task_id, user_id, description),
+                )
                 await db.commit()
         except Exception as e:
-            print(f"Error when adding a task: {e}")
+            print(f"Error adding task: {e}")
 
     async def get_tasks(self, user_id, limit=10, offset=0):
         # Get the list of tasks with pagination.

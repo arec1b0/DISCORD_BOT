@@ -8,7 +8,7 @@ async def setup_commands(bot, db: DB):  # Pass db as a dependency
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def add(ctx, *, task_desc):
         await db.add_task(ctx.author.id, task_desc)
-        await ctx.send(f"Task added: {task_desc}")
+        await ctx.send(f"✅Task added: {task_desc}")
 
     @bot.command()
     async def list(ctx):
@@ -22,29 +22,29 @@ async def setup_commands(bot, db: DB):  # Pass db as a dependency
     @bot.command()
     async def done(ctx, task_id: str):
         if not task_id.isdigit():
-            await ctx.send("Error: Task ID must be an integer.")
+            await ctx.send("❌Error: Task ID must be an integer.")
             return
         task_id = int(task_id)
         if await db.mark_task_done(ctx.author.id, task_id, True):
-            await ctx.send(f"Task {task_id} completed!")
+            await ctx.send(f"✅Task {task_id} completed!")
         else:
-            await ctx.send(f"Error: Task {task_id} not found.")
+            await ctx.send(f"❌Error: Task {task_id} not found.")
 
     @bot.command()
     async def delete(ctx, task_id: str):
         if not task_id.isdigit():
-            await ctx.send("Error: Task ID must be an integer.")
+            await ctx.send("❌Error: Task ID must be an integer.")
             return
         task_id = int(task_id)
         if await db.delete_task(ctx.author.id, task_id):
-            await ctx.send(f"Task {task_id} deleted!")
+            await ctx.send(f"🗑️Task {task_id} deleted!")
         else:
-            await ctx.send(f"Error: Task {task_id} not found.")
+            await ctx.send(f"❌Error: Task {task_id} not found.")
 
     @bot.command()
     async def help(ctx):
         help_text = (
-            "**Available Commands:**\n"
+            ":scroll:**Available Commands:**\n"
             "`!add <description>` — Add a new task.\n"
             "`!list` — Show all tasks.\n"
             "`!done <id>` — Mark a task as completed.\n"
