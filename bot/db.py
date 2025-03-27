@@ -59,7 +59,7 @@ class DB:
             print(f"Error when getting tasks: {e}")
             return []
 
-    async def update_task_status(self, user_id, task_id, status):
+    async def mark_task_done(self, user_id, task_id, status):
         # Updating the task status.
         try:
             async with self.get_db() as db:

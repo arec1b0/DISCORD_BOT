@@ -24,7 +24,7 @@ bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
-    print(f'Commands: {list(bot.commands)}')  # Output the list of commands
+    print(f'By 4|_E><')  # Output the list of commands
 
 async def main():
     db = DB()  # Create a database instance
@@ -38,3 +38,4 @@ if __name__ == '__main__':
         asyncio.run(main())
     except KeyboardInterrupt:
         print("Shutting down the bot gracefully.")
+        
