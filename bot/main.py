@@ -13,7 +13,7 @@ if not TOKEN:
     raise ValueError("Error: The DISCORD_TOKEN environment variable is missing. Make sure that .env contains DISCORD_TOKEN=<your_token>.")
 
 intents = discord.Intents.all()
-intents.messages = False  # Disable unnecessary permissions
+intents.messages = True  
 intents.guilds = True
 intents.message_content = True  # Enable guild-related events
 
