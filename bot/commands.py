@@ -1,9 +1,9 @@
 from discord.ext import commands
-from .db import DB
+from bot.db import DB
 
-async def setup_commands(bot, db):
-    #Register commands and uses the passed DB instance
-    
+async def setup_commands(bot, db: DB):  # Pass db as a dependency
+    await db.init()  # Ensure the database tables exist
+
     @bot.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def add(ctx, *, task_desc):
@@ -22,33 +22,33 @@ async def setup_commands(bot, db):
     @bot.command()
     async def done(ctx, task_id: str):
         if not task_id.isdigit():
-            await ctx.send("Error: The task ID must be an integer.")
+            await ctx.send("Error: Task ID must be an integer.")
             return
         task_id = int(task_id)
         if await db.update_task_status(ctx.author.id, task_id, True):
-            await ctx.send(f"Task {task_id} is complete!")
+            await ctx.send(f"Task {task_id} completed!")
         else:
-            await ctx.send(f"Error: Task {task_id} was not found.")
+            await ctx.send(f"Error: Task {task_id} not found.")
 
     @bot.command()
     async def delete(ctx, task_id: str):
         if not task_id.isdigit():
-            await ctx.send("Error: The task ID must be an integer.")
+            await ctx.send("Error: Task ID must be an integer.")
             return
         task_id = int(task_id)
         if await db.delete_task(ctx.author.id, task_id):
-            await ctx.send(f"Task {task_id} has been deleted!")
+            await ctx.send(f"Task {task_id} deleted!")
         else:
-            await ctx.send(f"Error: Task {task_id} was not found.")
+            await ctx.send(f"Error: Task {task_id} not found.")
 
     @bot.command()
     async def help(ctx):
         help_text = (
-            "**Available commands:**\n"
-            "`'!add description' - add new task.`\n"
-            "`'!list' - show all tasks.`\n"
-            "`'!done <number>' - mark task as done.`\n"
-            "`'!delete <number>' - delete task.`\n"
-            "`'!help' - show list of commands.`"
+            "**Available Commands:**\n"
+            "`!add <description>` — Add a new task.\n"
+            "`!list` — Show all tasks.\n"
+            "`!done <id>` — Mark a task as completed.\n"
+            "`!delete <id>` — Delete a task.\n"
+            "`!help` — Show the list of commands."
         )
         await ctx.send(help_text)
