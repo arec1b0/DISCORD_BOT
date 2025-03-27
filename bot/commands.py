@@ -45,10 +45,10 @@ async def setup_commands(bot, db):
     async def help(ctx):
         help_text = (
             "**Available commands:**\n"
-            "`!add description' - add new task.\n"
-            "`!list - show all tasks.\n"
-            "`!done <number>' - mark task as done.\n"
-            "`!delete <number>' - delete task.\n"
-            "`!help` - show list of commands."
+            "`'!add description' - add new task.`\n"
+            "`'!list' - show all tasks.`\n"
+            "`'!done <number>' - mark task as done.`\n"
+            "`'!delete <number>' - delete task.`\n"
+            "`'!help' - show list of commands.`"
         )
         await ctx.send(help_text)
