@@ -1,189 +1,135 @@
-# Discord To-Do Bot
+# Discord Task Manager Bot
 
-A lightweight, production-ready Discord bot designed to streamline task management directly within your Discord server. This bot empowers teams and individuals to manage tasks efficiently through a set of intuitive commands.
+A lightweight Discord bot designed to help users create, list, complete, and delete tasks. Powered by `discord.py` with a simple SQLite database for seamless task management.
 
----
+## Overview
 
-## Project Overview
+This project offers a straightforward approach to to-do list management within a Discord server:
+- **Local storage** of tasks via SQLite (no external DB required).
+- **Simple command-based interface** for quick and interactive task management.
+- **Customizable command prefix** (default: `!`).
+- **Modular structure** split into distinct files for clarity and maintainability.
 
-The Discord To-Do Bot simplifies task management by allowing users to add, list, complete, and remove tasks via Discord commands. Built with modularity in mind, the bot employs a cog-based architecture and leverages SQLite for persistent task storage.
+## Main Features
 
-### Key Features
-- **Task Management:** Seamlessly add, complete, and remove tasks.
-- **Task Listing:** Display tasks with clear status indicators.
-- **Modular Design:** Easy-to-extend cog-based structure for future enhancements.
-- **Lightweight & Efficient:** Built using Python and SQLite to maintain performance in small-to-medium deployments.
+1. **Add Tasks**  
+   Create new tasks tied to your Discord user ID.
+2. **List Tasks**  
+   Retrieve all tasks you have created, including completed and pending ones.
+3. **Mark Tasks as Done**  
+   Quickly indicate a task’s completion status.
+4. **Delete Tasks**  
+   Remove tasks entirely when no longer needed.
+5. **Customizable Commands**  
+   Extend or modify existing commands without tangling with the main bot logic.
 
----
+## Repository Structure
 
-## Installation & Setup
-
-### Cloning the Repository
-Clone the repository to your local machine:
-```bash
-git clone https://github.com/krinzhanovskyi/discord-todo-bot.git
-cd discord-todo-bot
+```
+.
+├── bot/
+│   ├── commands.py     # Defines and registers all bot commands
+│   ├── db.py           # SQLite database handling
+│   └── main.py         # Bot entry point, Discord event handling
+├── .gitignore          # Ignored files (.env, __pycache__, etc.)
+├── AUDIT.md            # Security audit report and recommendations
+├── bandit_report.html  # Bandit static analysis results
+└── requirements.txt    # Python dependencies
 ```
 
-### Setting Up the Environment on Debian
+## Setup Instructions
 
-1. **Update Your System:**
+1. **Clone the Repository**  
    ```bash
-   sudo apt update && sudo apt upgrade -y
+   git clone https://github.com/krinzhanovskyi/DISCORD_BOT.git
+   cd DISCORD_BOT
    ```
-2. **Install Python and pip (if not already installed):**
+   
+2. **Create a Virtual Environment (Optional but Recommended)**  
    ```bash
-   sudo apt install python3 python3-pip -y
-   ```
-3. **Create and Activate a Virtual Environment:**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-4. **Install Dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-### Setting Up the Environment on Windows
-
-1. **Ensure Python is Installed:**
-   - Download and install Python from the [official website](https://www.python.org/downloads/).  
-   - Make sure to check the option to add Python to your PATH during installation.
-
-2. **Open Command Prompt or PowerShell:**
-   - Navigate to the repository folder.
-
-3. **Create and Activate a Virtual Environment:**
-   ```powershell
    python -m venv venv
-   .\venv\Scripts\Activate
+   source venv/bin/activate  # On Unix-like systems
+   # or
+   venv\Scripts\activate     # On Windows
    ```
-   *Note: Use `.\venv\Scripts\activate` if you are using PowerShell.*
 
-4. **Install Dependencies:**
+3. **Install Dependencies**  
    ```bash
    pip install -r requirements.txt
    ```
 
----
+4. **Configure Environment**  
+   - Create a `.env` file in the project root.
+   - Add your Discord bot token:
+     ```
+     DISCORD_TOKEN=YOUR_DISCORD_BOT_TOKEN
+     ```
+   - (Optional) Adjust other environment variables as needed.
 
-## Configuration
+5. **Run the Bot**  
+   ```bash
+   python -m bot.main
+   ```
+   Once the bot connects, you should see a console message indicating it has successfully logged in.
 
-### Setting Up the .env File Securely
+## Usage Examples
 
-1. **Create a `.env` file** in the root directory.
-2. **Add the required environment variables.** Ensure that the file is kept secure and is included in `.gitignore` to avoid accidental commits of sensitive data.
+Below are the core commands. By default, all commands start with `!`. You can change this prefix in `main.py`.
 
-**Example .env File:**
-```env
-# Discord Bot Token (keep this secret!)
-DISCORD_TOKEN=your_discord_bot_token_here
+1. **Add a Task**
+   ```
+   !add Buy groceries
+   ```
+   Creates a new task with the description “Buy groceries.”
 
-# Command prefix for the bot
-COMMAND_PREFIX=!
+2. **List All Tasks**
+   ```
+   !list
+   ```
+   Shows all tasks associated with your user ID. Completed tasks are marked with a `✓`.
 
-# Path to the SQLite database file (default: tasks.db)
-DB_PATH=tasks.db
+3. **Mark a Task as Done**
+   ```
+   !done 1
+   ```
+   Marks task #1 as completed, if it exists.
 
-# Enable or disable debug mode (true/false)
-DEBUG_MODE=false
-```
+4. **Delete a Task**
+   ```
+   !delete 1
+   ```
+   Deletes task #1 entirely, if it exists.
 
----
+5. **View Available Commands**
+   ```
+   !help
+   ```
+   Displays a list of all commands and their usage.
 
-## Usage Guide
+## Security Considerations
 
-Start the bot with the following command:
-```bash
-python bot.py
-```
+- **Token Management**  
+  Your Discord bot token is read from a local `.env` file. Ensure you never commit this token to version control.
+- **SQL Injection Mitigation**  
+  The bot uses parameterized queries, but always double-check user inputs (especially `task_id`) for validity.
+- **Bot Permissions**  
+  By default, the bot requests `message_content` intent, which may be broader than necessary. Limit permissions whenever possible.
+- **Rate Limiting**  
+  Currently, commands can be spammed. Consider implementing [Discord cooldowns](https://discordpy.readthedocs.io/en/stable/ext/commands/api.html?highlight=cooldown#discord.ext.commands.cooldown) or other throttling mechanisms.
 
-### Bot Commands
+## Further Improvements
 
-- **`!addtask [task description]`**  
-  *Adds a new task.*  
-  **Expected Output:**  
-  `✅ Task added with ID <task_id>.`
+- **Automate Security Checks**  
+  The included `AUDIT.md` and `bandit_report.html` detail potential vulnerabilities and best practices. Regularly run tools like `bandit`, `safety`, or `pip-audit` in a CI/CD pipeline.
+- **Add More Commands or Features**  
+  For instance, a “due date” or “priority” field to tasks.
+- **Deploy on a Cloud Service**  
+  Consider running the bot continuously on platforms like Heroku, AWS, or other Docker-based services.
 
-- **`!removetask [task ID]`**  
-  *Removes an existing task.*  
-  **Expected Output:**  
-  `🗑️ Task <task_id> removed.` or `❌ No task found.`
+## Contributing
 
-- **`!complete [task ID]`**  
-  *Marks a task as completed.*  
-  **Expected Output:**  
-  `✅ Task <task_id> marked as completed.` or `❌ No task found.`
+Contributions are welcome. Please open an issue or submit a pull request with any feature requests or bug fixes. Be sure to adhere to any coding standards and best practices outlined in the project.
 
-- **`!listtasks`**  
-  *Lists all current tasks along with their completion status.*  
-  **Expected Output:**  
-  A formatted list displaying each task with an identifier, description, and a status indicator (✅/❌).
-
----
-
-## Development & Contribution
-
-### Code Structure Overview
-
-- **`cogs/`**  
-  Contains command modules (e.g., task-related commands).
-
-- **`utils/`**  
-  Includes utility modules such as the `TaskManager` for database operations.
-
-- **`bot.py`**  
-  The entry point for the bot, responsible for configuration and loading cogs.
-
-- **`config.py`**  
-  Centralized configuration handling for environment variables and settings.
-
-### Guidelines for Adding New Features
-
-- **Maintain Modularity:**  
-  Develop new features as separate cogs or modules to ensure scalability and ease of maintenance.
-
-- **Embrace Asynchronous Practices:**  
-  Future enhancements should leverage asynchronous operations to prevent blocking the event loop, especially when integrating with Discord's API.
-
-- **Testing:**  
-  Ensure all new features include appropriate unit tests and integrate smoothly with existing functionalities.
-
-- **Peer Reviews:**  
-  All contributions must undergo thorough code reviews focusing on security, performance, and maintainability.
-
----
-
-## Error Handling & Troubleshooting
-
-### Common Issues
-
-- **Missing Discord Token:**  
-  If the bot fails to start, verify that the `DISCORD_TOKEN` is correctly set in your `.env` file.
-
-- **Dependency Conflicts:**  
-  Ensure that you're using the correct Python version and that your virtual environment is active. Check for version mismatches in `requirements.txt`.
-
-### Debugging Tips
-
-- **Enable Debug Mode:**  
-  Set `DEBUG_MODE=true` in your `.env` file to receive detailed logs.
-
-- **Review Logs:**  
-  Monitor terminal outputs for error messages to pinpoint issues.
-
-- **Community Support:**  
-  Engage with GitHub issues or relevant Discord developer communities if you encounter persistent problems.
-
----
-
-## License & Credits
-
-### License
+## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-### Contributors
-- **Oleksandr Krizhanovskyi** – Project Lead & Primary Developer
-- **Key Contributors:**  
-  - [Daniil](github.com/dkrizhanovskyi) - Technical Advisor
