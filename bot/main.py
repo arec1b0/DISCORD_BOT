@@ -14,7 +14,6 @@ if not TOKEN:
 
 # Define intents
 intents = discord.Intents.default()
-intents.messages = True  # Enable message processing
 intents.guilds = True
 intents.message_content = True  # Enable access to message content
 
