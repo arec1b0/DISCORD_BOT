@@ -11,6 +11,7 @@ async def setup_commands(bot, db: DB):  # Pass db as a dependency
         await ctx.send(f"✅Task added: {task_desc}")
 
     @bot.command()
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def list(ctx):
         tasks = await db.get_tasks(ctx.author.id)
         if not tasks:
@@ -20,6 +21,7 @@ async def setup_commands(bot, db: DB):  # Pass db as a dependency
         await ctx.send(response)
 
     @bot.command()
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def done(ctx, task_id: str):
         if not task_id.isdigit():
             await ctx.send("❌Error: Task ID must be an integer.")
@@ -31,6 +33,7 @@ async def setup_commands(bot, db: DB):  # Pass db as a dependency
             await ctx.send(f"❌Error: Task {task_id} not found.")
 
     @bot.command()
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def delete(ctx, task_id: str):
         if not task_id.isdigit():
             await ctx.send("❌Error: Task ID must be an integer.")
@@ -42,6 +45,7 @@ async def setup_commands(bot, db: DB):  # Pass db as a dependency
             await ctx.send(f"❌Error: Task {task_id} not found.")
 
     @bot.command()
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def help(ctx):
         help_text = (
             ":scroll:**Available Commands:**\n"
