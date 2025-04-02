@@ -1,48 +1,45 @@
-import discord
-from discord.ext import commands
-from dotenv import load_dotenv
-import os
-from bot.commands import setup_commands
-from bot.db import DB  # Import DB class
+import sys
 import asyncio
 import logging
 
-# Logging setup
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
+from .config.settings import create_config
+from .core.bot import BotManager
+from .database.sqlite import SQLiteDatabaseManager
+from .commands.task import TaskCommandHandler
+from .commands.help import HelpCommandHandler
 
-load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
-
-if not TOKEN:
-    raise ValueError("Error: DISCORD_TOKEN environment variable is missing. Make sure .env contains DISCORD_TOKEN=<your_token>.")
-
-# Define necessary intents
-intents = discord.Intents.default()
-intents.guilds = True   # Sufficient for working with guilds
-intents.message_content = True  # Necessary access to message content
-
-# Create a bot instance
-bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
-
-@bot.event
-async def on_ready():
-    logging.info(f"Bot started as {bot.user}")
-    logging.info(f"Connected to {len(bot.guilds)} guilds")
-    logging.info(f"By 4|_E><")
-
-async def main():
-    db = DB()  # Create a database instance
-    await db.init()   # Initialize the database
-
-    await setup_commands(bot, db)  # Pass db to setup_commands
-    await bot.start(TOKEN)
+async def main() -> int:
+    """Точка входа в приложение."""
+    try:
+        # Пробуем загрузить конфигурацию
+        try:
+            config = create_config()
+        except ValueError as config_error:
+            # Если произошла ошибка конфигурации, выводим понятное сообщение
+            print(f"Fatal error: {config_error}")
+            return 1
+            
+        # Инициализируем бот-менеджер
+        bot_manager = BotManager(config)
+        
+        # Настраиваем базу данных
+        bot_manager.db = SQLiteDatabaseManager()
+        await bot_manager.db.init()
+        
+        # Настраиваем обработчики команд
+        bot_manager.task_handler = TaskCommandHandler(bot_manager.db, bot_manager.logger)
+        bot_manager.help_handler = HelpCommandHandler(logger=bot_manager.logger)
+        
+        # Запускаем бота
+        return await bot_manager.run()
+        
+    except Exception as e:
+        # Обрабатываем другие ошибки
+        logger = logging.getLogger('discord_bot')
+        logger.critical(f"Fatal error: {e}")
+        print(f"Произошла ошибка при запуске бота: {e}")
+        return 1
 
 if __name__ == '__main__':
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        logging.info("Shutting down the bot gracefully.")
+    exit_code = asyncio.run(main())
+    sys.exit(exit_code)
